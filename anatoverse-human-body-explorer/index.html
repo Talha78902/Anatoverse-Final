@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AnatoVerse - Human Body Anatomy Explorer</title>
+  
+  <!-- Font and Stylesheets -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Core CDNs for ThreeJS & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header id="main-header">
+    <a href="#" class="logo-container">
+      <svg class="logo-icon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+      </svg>
+      <div>
+        <span class="logo-text">AnatoVerse</span>
+        <span class="logo-sub">Human Body Explorer</span>
+      </div>
+    </a>
+
+    <nav>
+      <a href="#hero-section" class="active">Home</a>
+      <a href="#explorer-viewer-section">Explorer</a>
+      <a href="#systems-grid-section">Systems</a>
+      <a href="#organs-grid-section">Organs</a>
+      <a href="#about-section">About</a>
+    </nav>
+
+    <div class="search-wrapper" id="search-wrapper">
+      <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+      <input type="text" class="search-input" id="explorer-search-input" placeholder="Search anatomy topics...">
+      <div class="search-results-dropdown" id="search-dropdown-results"></div>
+    </div>
+  </header>
+
+  <!-- Hero block -->
+  <section class="hero" id="hero-section">
+    <div class="hero-content">
+      <h1>Explore the <span>Human Body</span> in 3D</h1>
+      <p>Study complex systems, key organs, and body physiology through an interactive, clinical-grade 3D anatomy learning workspace built for students and educators.</p>
+      <div class="hero-buttons">
+        <a href="#explorer-viewer-section" class="btn btn-primary">Start Exploring</a>
+        <a href="#systems-grid-section" class="btn btn-secondary">View Body Systems</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <!-- Human body vector asset silhouette -->
+      <svg class="hero-visual-img" viewBox="0 0 200 200" fill="currentColor" text="#38bdf8">
+        <path d="M100 24c5-10 15-10 20 0s-10 40-20 40-15-30-20-40 15-10 20 0z" fill="#0284c7" />
+        <rect x="85" y="65" width="30" height="70" rx="10" fill="#0284c7" opacity="0.6"/>
+        <line x1="75" y1="70" x2="60" y2="120" stroke="#0284c7" stroke-width="12" stroke-linecap="round" />
+        <line x1="125" y1="70" x2="140" y2="120" stroke="#0284c7" stroke-width="12" stroke-linecap="round" />
+        <line x1="90" y1="135" x2="85" y2="185" stroke="#0284c7" stroke-width="14" stroke-linecap="round" />
+        <line x1="110" y1="135" x2="115" y2="185" stroke="#0284c7" stroke-width="14" stroke-linecap="round" />
+      </svg>
+    </div>
+  </section>
+
+  <!-- Centered Interactive Explorer Section -->
+  <section class="explorer-section" id="explorer-viewer-section">
+    <div class="section-head">
+      <h2>Interactive 3D Anatomy Suite</h2>
+      <p>Select a major bodily system on the left, spin the model, and click glowing hotspot markers to reveal clinical functions.</p>
+    </div>
+
+    <!-- Explorer Layout -->
+    <div class="explorer-grid">
+      <!-- Left systems selector -->
+      <div class="systems-selector-panel" id="systems-selector-container">
+        <div class="panel-title">Body Systems</div>
+        <!-- Load items dynamically via JS -->
+      </div>
+
+      <!-- Center 3D canvas viewport -->
+      <div class="canvas-wrapper" id="canvas-container">
+        <canvas id="canvas3d"></canvas>
+        <div class="hud-panel">
+          <div class="hud-logo">
+            <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background-color:#22d3ee"></span>
+            ANATOVERSE ENGINE v2.1
+          </div>
+          <div class="hud-title" id="hud-selected-channel">Complete Human Frame</div>
+        </div>
+        <div class="canvas-controls">
+          <button class="ctrl-btn" id="ctrl-reset" title="Reset Camera Location">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 6H16"></path></svg>
+          </button>
+          <button class="ctrl-btn text-cyan-400" id="ctrl-hotspots" title="Toggle Floating Hotspots">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+          </button>
+        </div>
+        <div class="canvas-instruction">DRAG WITH MOUSE TO ROTATE  •  SCROLL TO ZOOM</div>
+      </div>
+
+      <!-- Right dynamic bio data profile -->
+      <div class="info-details-panel" id="right-info-panel">
+        <!-- Dyn contents load here from JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- System cards list below -->
+  <section class="systems-grid-section" id="systems-grid-section">
+    <div class="section-head">
+      <h2>Comprehensive Body Systems</h2>
+      <p>Learn structural pathways, primary metabolic roles, common disorders, and system interactions.</p>
+    </div>
+    <div class="systems-cards-grid" id="systems-grid-container">
+      <!-- Loaded dynamically -->
+    </div>
+  </section>
+
+  <!-- Organ cards list below -->
+  <section class="organs-grid-section" id="organs-grid-section">
+    <div class="organs-grid-container">
+      <div class="section-head">
+        <h2>Primary Organs Index</h2>
+        <p>A deeper academic catalog detailing tissues, location, structures, and essential facts.</p>
+      </div>
+      <div class="organs-grid" id="organs-grid-container">
+        <!-- Loaded dynamically -->
+      </div>
+    </div>
+  </section>
+
+ 
+
+  <!-- About section -->
+  <section class="about-section" id="about-section">
+    <div class="about-content">
+      <h2>About AnatoVerse Explorer</h2>
+      <p>AnatoVerse Human Body Explorer is a high-fidelity interactive academic sandbox built to help students map the architectural lines, primary organs, and system operations of human biology.</p>
+      <p>The 3D environment was generated procedurally to provide a direct physical mapping of joints, skeletal ribs, nervous synapses, airways, digestive loops, cardiovascular arteries and kidneys inside a glowing holographic mannequin.</p>
+      <p class="social-credits">Academic Version 2.1 • Crafted with WebGL/ThreeJS</p>
+    </div>
+  </section>
+
+  <!-- Solid clinical footer -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-about">
+        <h4>AnatoVerse Human Body Explorer</h4>
+        <p>A leading standalone educational 3D exploration deck focusing purely on anatomical research, designed to optimize learning density on high-resolution displays.</p>
+        <div class="medical-disclaimer">
+          <strong>MEDICAL DISCLAIMER:</strong> This website is for educational purposes only. It does not provide medical advice, diagnosis, or treatment. Always consult qualified clinical professionals for medical assistance.
+        </div>
+      </div>
+      <div style="text-align:right">
+        <p style="font-weight:600; color:white; margin-bottom:1rem">Quick Indices</p>
+        <p><a href="#hero-section" style="color:#94a3b8; text-decoration:none">Back to top</a></p>
+        <p><a href="#explorer-viewer-section" style="color:#94a3b8; text-decoration:none; margin-top:0.5rem; display:block">3D Explorer View</a></p>
+        <p><a href="#systems-grid-section" style="color:#94a3b8; text-decoration:none; margin-top:0.5rem; display:block">Human Systems</a></p>
+        <p><a href="#organs-grid-section" style="color:#94a3b8; text-decoration:none; margin-top:0.5rem; display:block">Organ Structures</a></p>
+      </div>
+    </div>
+    <div class="footer-copy">
+      &copy; 2026 AnatoVerse Inc. Educational Suite. All Rights Reserved.
+    </div>
+  </footer>
+
+  <!-- Bind scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "users": [
+    {
+      "id": "usr_b55ad31593147891",
+      "name": "talha",
+      "email": "2024-uam-019@mnsuam.edu.pk",
+      "passwordHash": "170d9869fb3e71fd1febc0bf0f5d6b37:79d8a20954edcf8a6a9bf98e10a35eb43dd959666a675b763b0b98659492cd881fa29890bab02bf0a5661319556b6874a4c74d70e9662c0869fc89a3dab155fb",
+      "createdAt": "2026-06-21T18:34:32.127Z",
+      "progress": {
+        "organs": [],
+        "systems": []
+      },
+      "sessions": [
+        {
+          "token": "sess_497d18c0878c3fd0",
+          "createdAt": "2026-06-21T18:34:32.127Z"
+        }
+      ]
+    }
+  ]
+}
